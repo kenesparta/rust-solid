@@ -1,4 +1,4 @@
-use chrono::{Datelike, NaiveDateTime};
+use chrono::{Datelike, Months, NaiveDateTime};
 use postgres::{Client, NoTls};
 use rust_decimal::Decimal;
 use serde_derive::Deserialize;
@@ -64,14 +64,38 @@ impl GenerateInvoices {
                         &[&r.id],
                     )
                     .expect("Failed to fetch rows.");
-                payment
-                    .iter()
-                    .map(|p| Output {
-                        date: p.get("date"),
-                        amount: p.get("amount"),
-                    })
-                    .filter(|out| out.date.month() == input.month && out.date.year() == input.year)
-                    .collect::<Vec<Output>>()
+                if input.input_type == "cash" {
+                    return payment
+                        .iter()
+                        .map(|p| Output {
+                            date: p.get("date"),
+                            amount: p.get("amount"),
+                        })
+                        .filter(|out| {
+                            out.date.month() == input.month && out.date.year() == input.year
+                        })
+                        .collect::<Vec<Output>>();
+                }
+
+                if input.input_type == "accrual" {
+                    return (0..=r.periods)
+                        .map(|idx| {
+                            let date_time: NaiveDateTime = r.date;
+                            let amount: Decimal = r.amount;
+                            Output {
+                                date: date_time
+                                    .checked_add_months(Months::new(idx as u32))
+                                    .unwrap(),
+                                amount: amount / Decimal::from(r.periods),
+                            }
+                        })
+                        .filter(|out| {
+                            out.date.month() == input.month && out.date.year() == input.year
+                        })
+                        .collect::<Vec<Output>>();
+                }
+
+                Vec::new()
             })
             .flatten()
             .collect();
