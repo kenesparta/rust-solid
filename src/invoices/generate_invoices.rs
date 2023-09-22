@@ -1,8 +1,10 @@
+use crate::invoices::contract_database_depository::ContractDatabaseRepository;
 use chrono::{Datelike, Months, NaiveDateTime};
 use postgres::{Client, NoTls};
 use rust_decimal::Decimal;
 use serde_derive::Deserialize;
 use uuid::Uuid;
+use crate::invoices::contract_repository::ContractRepository;
 
 #[derive(Debug, Deserialize)]
 pub struct Contract {
@@ -37,25 +39,7 @@ impl GenerateInvoices {
         let mut client = Client::connect("postgresql://user:user@localhost/user", NoTls)
             .expect("Failed to connect to database.");
 
-        let rows = client
-            .query(
-                "SELECT id, description, amount, periods, date FROM ken.contract",
-                &[],
-            )
-            .expect("Failed to fetch rows.");
-
-        let contracts: Vec<Contract> = rows
-            .iter()
-            .map(|r| Contract {
-                id: r.get("id"),
-                description: r.get("description"),
-                amount: r.get("amount"),
-                periods: r.get("periods"),
-                date: r.get("date"),
-            })
-            .collect();
-
-        let payments: Vec<Output> = contracts
+        let payments: Vec<Output> = ContractDatabaseRepository::list()
             .iter()
             .map(|r| {
                 let payment = client
