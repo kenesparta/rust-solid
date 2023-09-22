@@ -1,10 +1,9 @@
 use crate::invoices::contract_database_depository::ContractDatabaseRepository;
+use crate::invoices::contract_repository::ContractRepository;
 use chrono::{Datelike, Months, NaiveDateTime};
-use postgres::{Client, NoTls};
 use rust_decimal::Decimal;
 use serde_derive::Deserialize;
 use uuid::Uuid;
-use crate::invoices::contract_repository::ContractRepository;
 
 #[derive(Debug, Deserialize)]
 pub struct Contract {
@@ -13,6 +12,13 @@ pub struct Contract {
     pub amount: Decimal,
     pub periods: i32,
     pub date: NaiveDateTime,
+    pub payments: Vec<Payment>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct Payment {
+    pub date: NaiveDateTime,
+    pub amount: Decimal,
 }
 
 #[derive(Debug, Deserialize)]
@@ -36,24 +42,16 @@ impl GenerateInvoices {
     }
 
     pub fn execute(&self, input: Input) -> Vec<Output> {
-        let mut client = Client::connect("postgresql://user:user@localhost/user", NoTls)
-            .expect("Failed to connect to database.");
-
         let payments: Vec<Output> = ContractDatabaseRepository::list()
             .iter()
             .map(|r| {
-                let payment = client
-                    .query(
-                        "SELECT amount, date FROM ken.payment WHERE id_contract = $1",
-                        &[&r.id],
-                    )
-                    .expect("Failed to fetch rows.");
                 if input.input_type == "cash" {
-                    return payment
+                    return r
+                        .payments
                         .iter()
                         .map(|p| Output {
-                            date: p.get("date"),
-                            amount: p.get("amount"),
+                            date: p.date,
+                            amount: p.amount,
                         })
                         .filter(|out| {
                             out.date.month() == input.month && out.date.year() == input.year
