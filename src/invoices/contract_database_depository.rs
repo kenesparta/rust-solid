@@ -4,8 +4,14 @@ use postgres::{Client, NoTls};
 
 pub struct ContractDatabaseRepository {}
 
+impl ContractDatabaseRepository {
+    pub fn new() -> Self {
+        ContractDatabaseRepository {}
+    }
+}
+
 impl ContractRepository for ContractDatabaseRepository {
-    fn list() -> Vec<Contract> {
+    fn list(&self) -> Vec<Contract> {
         let mut client = Client::connect("postgresql://user:user@localhost/user", NoTls)
             .expect("Failed to connect to database.");
 
@@ -19,25 +25,27 @@ impl ContractRepository for ContractDatabaseRepository {
         rows.iter()
             .map(|r| {
                 let id = r.get("id");
-                let payment = client
+                let payment_rows = client
                     .query(
                         "SELECT amount, date FROM ken.payment WHERE id_contract = $1",
                         &[&id],
                     )
                     .expect("Failed to fetch rows.");
+                let payments = payment_rows
+                    .iter()
+                    .map(|p| Payment {
+                        date: p.get("date"),
+                        amount: p.get("amount"),
+                    })
+                    .collect::<Vec<Payment>>();
+
                 Contract {
                     id,
+                    payments,
                     description: r.get("description"),
                     amount: r.get("amount"),
                     periods: r.get("periods"),
                     date: r.get("date"),
-                    payments: payment
-                        .iter()
-                        .map(|p| Payment {
-                            date: p.get("date"),
-                            amount: p.get("amount"),
-                        })
-                        .collect::<Vec<Payment>>(),
                 }
             })
             .collect::<Vec<Contract>>()

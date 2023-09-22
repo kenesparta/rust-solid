@@ -1,4 +1,3 @@
-use crate::invoices::contract_database_depository::ContractDatabaseRepository;
 use crate::invoices::contract_repository::ContractRepository;
 use chrono::{Datelike, Months, NaiveDateTime};
 use rust_decimal::Decimal;
@@ -34,15 +33,26 @@ pub struct Output {
     pub amount: Decimal,
 }
 
-pub struct GenerateInvoices {}
+/// DIP: High level components should not depend on low level components
+/// They should depend on abstractions.
+pub struct GenerateInvoices<T> {
+    contract_repository: T,
+}
 
-impl GenerateInvoices {
-    pub fn new() -> Self {
-        Self {}
+impl<T> GenerateInvoices<T>
+where
+    T: ContractRepository,
+{
+    pub fn new(contract_repository: T) -> Self {
+        GenerateInvoices {
+            contract_repository,
+        }
     }
 
     pub fn execute(&self, input: Input) -> Vec<Output> {
-        let payments: Vec<Output> = ContractDatabaseRepository::list()
+        let payments: Vec<Output> = self
+            .contract_repository
+            .list()
             .iter()
             .map(|r| {
                 if input.input_type == "cash" {

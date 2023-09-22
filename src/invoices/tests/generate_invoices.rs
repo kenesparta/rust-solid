@@ -1,3 +1,5 @@
+use crate::invoices::contract_database_depository::ContractDatabaseRepository;
+use crate::invoices::contract_mock_depository::ContractMockRepository;
 use crate::invoices::generate_invoices::{GenerateInvoices, Input};
 use rust_decimal::prelude::ToPrimitive;
 
@@ -6,7 +8,7 @@ use rust_decimal::prelude::ToPrimitive;
 ///
 /// `type cash`
 fn generate_notas_fiscais_cash() {
-    let generate_invoices = GenerateInvoices::new();
+    let generate_invoices = GenerateInvoices::new(ContractDatabaseRepository::new());
     let input = Input {
         month: 1,
         year: 2022,
@@ -22,7 +24,7 @@ fn generate_notas_fiscais_cash() {
 ///
 /// `type accural`
 fn generate_notas_fiscais_accrual_mont_1() {
-    let generate_invoices = GenerateInvoices::new();
+    let generate_invoices = GenerateInvoices::new(ContractDatabaseRepository::new());
     let input = Input {
         month: 1,
         year: 2022,
@@ -38,7 +40,7 @@ fn generate_notas_fiscais_accrual_mont_1() {
 ///
 /// `type accural`
 fn generate_notas_fiscais_accrual_month_2() {
-    let generate_invoices = GenerateInvoices::new();
+    let generate_invoices = GenerateInvoices::new(ContractDatabaseRepository::new());
     let input = Input {
         month: 2,
         year: 2022,
@@ -54,7 +56,8 @@ fn generate_notas_fiscais_accrual_month_2() {
 ///
 /// `type accural`
 fn generate_notas_fiscais_accrual_month_11() {
-    let generate_invoices = GenerateInvoices::new();
+    let contract_repo = ContractMockRepository::new();
+    let generate_invoices = GenerateInvoices::new(contract_repo);
     let input = Input {
         month: 11,
         year: 2022,
