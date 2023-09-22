@@ -2,7 +2,6 @@ use crate::invoices::contract_repository::ContractRepository;
 use crate::invoices::generate_invoices::{Contract, Payment};
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use rust_decimal::Decimal;
-use std::fmt::Error;
 
 pub struct ContractMockRepository {}
 
