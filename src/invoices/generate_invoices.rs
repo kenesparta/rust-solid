@@ -49,10 +49,9 @@ where
         }
     }
 
-    pub fn execute(&self, input: Input) -> Vec<Output> {
-        let payments: Vec<Output> = self
-            .contract_repository
-            .list()
+    pub fn execute(&self, input: Input) -> Result<Vec<Output>, String> {
+        let payments = self.contract_repository.list()?;
+        Ok(payments
             .iter()
             .map(|r| {
                 if input.input_type == "cash" {
@@ -90,8 +89,6 @@ where
                 Vec::new()
             })
             .flatten()
-            .collect();
-
-        payments
+            .collect())
     }
 }
