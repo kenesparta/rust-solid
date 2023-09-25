@@ -1,5 +1,6 @@
 use crate::invoices::contract_database_depository::PostgresAdapter;
 use crate::invoices::contract_mock_depository::MockAdapter;
+use crate::invoices::contracts::InvoiceType::{ACCRUAL, CASH};
 use crate::invoices::generate_invoices::{GenerateInvoices, Input};
 use rust_decimal::prelude::ToPrimitive;
 
@@ -13,7 +14,7 @@ fn generate_notas_fiscais_cash() {
     let input = Input {
         month: 1,
         year: 2022,
-        input_type: "cash".to_string(),
+        invoice_type: CASH,
     };
     match generate_invoices.execute(input) {
         Ok(c) => {
@@ -34,7 +35,7 @@ fn generate_notas_fiscais_accrual_mont_1() {
     let input = Input {
         month: 1,
         year: 2022,
-        input_type: "accrual".to_string(),
+        invoice_type: ACCRUAL,
     };
     match generate_invoices.execute(input) {
         Ok(c) => {
@@ -55,7 +56,7 @@ fn generate_notas_fiscais_accrual_month_2() {
     let input = Input {
         month: 2,
         year: 2022,
-        input_type: "accrual".to_string(),
+        invoice_type: ACCRUAL,
     };
     match generate_invoices.execute(input) {
         Ok(c) => {
@@ -76,7 +77,7 @@ fn generate_notas_fiscais_accrual_month_11() {
     let input = Input {
         month: 11,
         year: 2022,
-        input_type: "accrual".to_string(),
+        invoice_type: ACCRUAL,
     };
     match generate_invoices.execute(input) {
         Ok(c) => {

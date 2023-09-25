@@ -1,5 +1,6 @@
 use crate::invoices::contract_repository::ContractRepository;
-use crate::invoices::generate_invoices::{Contract, Payment};
+use crate::invoices::contracts::Contract;
+use crate::invoices::payment::Payment;
 use postgres::{Client, NoTls};
 
 pub struct PostgresAdapter {
