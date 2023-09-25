@@ -3,16 +3,19 @@ use crate::invoices::generate_invoices::{Contract, Payment};
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use rust_decimal::Decimal;
 
-pub struct ContractMockRepository {}
+pub struct MockAdapter {}
 
-impl ContractMockRepository {
-    pub fn new() -> Self {
-        ContractMockRepository {}
+/// # Adapter
+/// The Adapter Pattern is a structural design pattern that allows you to adapt the interface of
+/// one class into another interface that clients expect
+impl MockAdapter {
+    pub fn new() -> Result<Self, postgres::Error> {
+        Ok(MockAdapter {})
     }
 }
 
-impl ContractRepository for ContractMockRepository {
-    fn list(&self) -> Result<Vec<Contract>, String> {
+impl ContractRepository for MockAdapter {
+    fn list(&mut self) -> Result<Vec<Contract>, String> {
         let mut contracts: Vec<Contract> = Vec::new();
         contracts.push(Contract {
             id: Default::default(),

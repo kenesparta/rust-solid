@@ -1,22 +1,25 @@
 use crate::invoices::contract_repository::ContractRepository;
 use crate::invoices::generate_invoices::{Contract, Payment};
 use postgres::{Client, NoTls};
-use std::fmt::Error;
 
-pub struct ContractDatabaseRepository {}
+pub struct PostgresAdapter {
+    pub(crate) client: Client,
+}
 
-impl ContractDatabaseRepository {
-    pub fn new() -> Self {
-        ContractDatabaseRepository {}
+/// # Adapter
+/// The Adapter Pattern is a structural design pattern that allows you to adapt the interface of
+/// one class into another interface that clients expect
+impl PostgresAdapter {
+    pub fn new() -> Result<Self, postgres::Error> {
+        let client = Client::connect("postgresql://user:user@localhost/user", NoTls)?;
+        Ok(PostgresAdapter { client })
     }
 }
 
-impl ContractRepository for ContractDatabaseRepository {
-    fn list(&self) -> Result<Vec<Contract>, String> {
-        let mut client = Client::connect("postgresql://user:user@localhost/user", NoTls)
-            .expect("Failed to connect to database.");
-
-        let rows = client
+impl ContractRepository for PostgresAdapter {
+    fn list(&mut self) -> Result<Vec<Contract>, String> {
+        let rows = self
+            .client
             .query(
                 "SELECT id, description, amount, periods, date FROM ken.contract",
                 &[],
@@ -27,7 +30,8 @@ impl ContractRepository for ContractDatabaseRepository {
             .iter()
             .map(|r| {
                 let id = r.get("id");
-                let payment_rows = client
+                let payment_rows = self
+                    .client
                     .query(
                         "SELECT amount, date FROM ken.payment WHERE id_contract = $1",
                         &[&id],

@@ -49,7 +49,7 @@ where
         }
     }
 
-    pub fn execute(&self, input: Input) -> Result<Vec<Output>, String> {
+    pub fn execute(&mut self, input: Input) -> Result<Vec<Output>, Box<dyn std::error::Error>> {
         let payments = self.contract_repository.list()?;
         Ok(payments
             .iter()

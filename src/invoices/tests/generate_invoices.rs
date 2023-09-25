@@ -1,5 +1,5 @@
-use crate::invoices::contract_database_depository::ContractDatabaseRepository;
-use crate::invoices::contract_mock_depository::ContractMockRepository;
+use crate::invoices::contract_database_depository::PostgresAdapter;
+use crate::invoices::contract_mock_depository::MockAdapter;
 use crate::invoices::generate_invoices::{GenerateInvoices, Input};
 use rust_decimal::prelude::ToPrimitive;
 
@@ -8,7 +8,8 @@ use rust_decimal::prelude::ToPrimitive;
 ///
 /// `type cash`
 fn generate_notas_fiscais_cash() {
-    let generate_invoices = GenerateInvoices::new(ContractDatabaseRepository::new());
+    let postgres_adapter = PostgresAdapter::new().unwrap();
+    let mut generate_invoices = GenerateInvoices::new(postgres_adapter);
     let input = Input {
         month: 1,
         year: 2022,
@@ -28,7 +29,8 @@ fn generate_notas_fiscais_cash() {
 ///
 /// `type accural`
 fn generate_notas_fiscais_accrual_mont_1() {
-    let generate_invoices = GenerateInvoices::new(ContractDatabaseRepository::new());
+    let postgres_adapter = PostgresAdapter::new().unwrap();
+    let mut generate_invoices = GenerateInvoices::new(postgres_adapter);
     let input = Input {
         month: 1,
         year: 2022,
@@ -48,7 +50,8 @@ fn generate_notas_fiscais_accrual_mont_1() {
 ///
 /// `type accural`
 fn generate_notas_fiscais_accrual_month_2() {
-    let generate_invoices = GenerateInvoices::new(ContractDatabaseRepository::new());
+    let postgres_adapter = PostgresAdapter::new().unwrap();
+    let mut generate_invoices = GenerateInvoices::new(postgres_adapter);
     let input = Input {
         month: 2,
         year: 2022,
@@ -68,8 +71,8 @@ fn generate_notas_fiscais_accrual_month_2() {
 ///
 /// `type accural`
 fn generate_notas_fiscais_accrual_month_11() {
-    let contract_repo = ContractMockRepository::new();
-    let generate_invoices = GenerateInvoices::new(contract_repo);
+    let mock_adapter = MockAdapter::new().unwrap();
+    let mut generate_invoices = GenerateInvoices::new(mock_adapter);
     let input = Input {
         month: 11,
         year: 2022,
