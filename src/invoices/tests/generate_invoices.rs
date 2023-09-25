@@ -1,6 +1,6 @@
+use crate::invoices::contract::InvoiceType::{ACCRUAL, CASH};
 use crate::invoices::contract_database_depository::PostgresAdapter;
 use crate::invoices::contract_mock_depository::MockAdapter;
-use crate::invoices::contracts::InvoiceType::{ACCRUAL, CASH};
 use crate::invoices::generate_invoices::{GenerateInvoices, Input};
 use rust_decimal::prelude::ToPrimitive;
 

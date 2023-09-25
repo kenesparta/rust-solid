@@ -1,5 +1,5 @@
+use crate::invoices::contract::Contract;
 use crate::invoices::contract_repository::ContractRepository;
-use crate::invoices::contracts::Contract;
 use crate::invoices::payment::Payment;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use rust_decimal::Decimal;

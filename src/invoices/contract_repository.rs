@@ -1,4 +1,4 @@
-use crate::invoices::contracts::Contract;
+use crate::invoices::contract::Contract;
 
 /// The objective of **Repositories** is the aggregates persistence.
 /// Aggregates are clusters of Domain objects such as `entities` and `Value Objects`
