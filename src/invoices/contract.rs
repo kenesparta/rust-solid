@@ -1,14 +1,26 @@
 use crate::invoices::invoice::Invoice;
+use crate::invoices::invoice_generation_strategy::InvoiceGenerationFactory;
 use crate::invoices::payment::Payment;
-use chrono::{Datelike, Months, NaiveDateTime};
+use chrono::NaiveDateTime;
 use rust_decimal::Decimal;
-use serde_derive::Deserialize;
 use uuid::Uuid;
 
-#[derive(Debug, Copy, Clone, Deserialize)]
+#[derive(Debug, Copy, Clone)]
 pub enum InvoiceType {
     CASH,
     ACCRUAL,
+}
+
+impl std::str::FromStr for InvoiceType {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "cash" => Ok(InvoiceType::CASH),
+            "accrual" => Ok(InvoiceType::ACCRUAL),
+            _ => Err(()),
+        }
+    }
 }
 
 /// Aggregate Root: Contract
@@ -23,37 +35,9 @@ pub struct Contract {
 }
 
 impl Contract {
-    pub fn generate_invoices(
-        &self,
-        month: u32,
-        year: i32,
-        invoice_type: InvoiceType,
-    ) -> Vec<Invoice> {
-        match invoice_type {
-            InvoiceType::CASH => self
-                .payments
-                .iter()
-                .map(|p| Invoice {
-                    date: p.date,
-                    amount: p.amount,
-                })
-                .filter(|out| out.date.month() == month && out.date.year() == year)
-                .collect::<Vec<Invoice>>(),
-            InvoiceType::ACCRUAL => {
-                return (0..=self.periods)
-                    .map(|idx| {
-                        let date_time: NaiveDateTime = self.date;
-                        let amount: Decimal = self.amount;
-                        Invoice {
-                            date: date_time
-                                .checked_add_months(Months::new(idx as u32))
-                                .unwrap(),
-                            amount: amount / Decimal::from(self.periods),
-                        }
-                    })
-                    .filter(|out| out.date.month() == month && out.date.year() == year)
-                    .collect::<Vec<Invoice>>();
-            }
-        }
+    pub fn generate_invoices(&self, month: u32, year: i32, invoice_type: String) -> Vec<Invoice> {
+        let inv_type_result = invoice_type.parse::<InvoiceType>().unwrap();
+        let invoice_type_selection = InvoiceGenerationFactory::create(inv_type_result);
+        invoice_type_selection.generate(self, month, year)
     }
 }
