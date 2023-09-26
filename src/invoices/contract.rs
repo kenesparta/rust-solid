@@ -2,6 +2,7 @@ use crate::invoices::invoice::Invoice;
 use crate::invoices::invoice_generation_strategy::InvoiceGenerationFactory;
 use crate::invoices::payment::Payment;
 use chrono::NaiveDateTime;
+use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
 use uuid::Uuid;
 
@@ -39,5 +40,13 @@ impl Contract {
         let inv_type_result = invoice_type.parse::<InvoiceType>().unwrap();
         let invoice_type_selection = InvoiceGenerationFactory::create(inv_type_result);
         invoice_type_selection.generate(self, month, year)
+    }
+
+    pub fn get_balance(&self) -> f64 {
+        let balance = self.amount.to_f64().unwrap();
+        self.payments
+            .iter()
+            .map(|p| p.amount.to_f64().unwrap())
+            .fold(balance, |acc, p| acc - p)
     }
 }
