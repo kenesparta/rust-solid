@@ -1,8 +1,8 @@
 use crate::invoices::contract::Contract;
+use crate::invoices::payment::Payment;
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use rust_decimal::prelude::ToPrimitive;
 use rust_decimal::Decimal;
-use crate::invoices::payment::Payment;
 
 #[test]
 /// Should generate invoices fom contract

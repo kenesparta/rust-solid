@@ -1,7 +1,9 @@
-use crate::invoices::contract_repository::ContractRepository;
 use chrono::NaiveDateTime;
 use rust_decimal::Decimal;
 use serde_derive::Deserialize;
+
+use crate::invoices::contract_repository::ContractRepository;
+use crate::invoices::presenter::Presenter;
 
 #[derive(Clone)]
 pub struct Input {
@@ -18,23 +20,26 @@ pub struct Output {
 
 /// DIP: High level components should not depend on low level components
 /// They should depend on abstractions.
-pub struct GenerateInvoices<T> {
-    contract_repository: T,
+pub struct GenerateInvoices<C, P: Presenter> {
+    contract_repository: C,
+    presenter: P,
 }
 
-impl<T> GenerateInvoices<T>
+impl<C, P> GenerateInvoices<C, P>
 where
-    T: ContractRepository,
+    C: ContractRepository,
+    P: Presenter,
 {
-    pub fn new(contract_repository: T) -> Self {
+    pub fn new(contract_repository: C, presenter: P) -> Self {
         GenerateInvoices {
             contract_repository,
+            presenter,
         }
     }
 
-    pub fn execute(&mut self, input: Input) -> Result<Vec<Output>, String> {
+    pub fn execute(&mut self, input: Input) -> Result<P::Output, String> {
         let payments = self.contract_repository.list()?;
-        Ok(payments
+        let output = payments
             .iter()
             .map(|r| r.generate_invoices(input.month, input.year, input.invoice_type.clone()))
             .flatten()
@@ -42,6 +47,7 @@ where
                 date: i.date,
                 amount: i.amount,
             })
-            .collect())
+            .collect::<Vec<Output>>();
+        Ok(self.presenter.present(output))
     }
 }
