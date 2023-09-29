@@ -1,5 +1,10 @@
 use crate::invoices::invoice_generation::Output;
 
+/// # Presenter
+/// The presenter pattern is a design pattern often used in software development to implement user
+/// interfaces, typically within the Model-View-Presenter (MVP) architecture. This pattern helps in
+/// organizing the code related to user interface (UI) in a manner that separates concerns, enhances
+/// testability, and improves code structure.
 pub trait Presenter {
     type Output;
     fn present(&self, output: Vec<Output>) -> Self::Output;

@@ -4,7 +4,7 @@ use crate::invoices::payment::Payment;
 use postgres::{Client, NoTls};
 
 pub struct PostgresAdapter {
-    pub(crate) client: Client,
+    pub client: Client,
 }
 
 /// # Adapter

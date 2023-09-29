@@ -1,18 +1,18 @@
 use chrono::NaiveDateTime;
 use rust_decimal::Decimal;
-use serde_derive::Deserialize;
+use serde_derive::{Deserialize, Serialize};
 
 use crate::invoices::contract_repository::ContractRepository;
 use crate::invoices::presenter::Presenter;
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct Input {
     pub month: u32,
     pub year: i32,
     pub invoice_type: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Output {
     pub date: NaiveDateTime,
     pub amount: Decimal,

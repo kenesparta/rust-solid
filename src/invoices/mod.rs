@@ -1,10 +1,10 @@
-mod contract;
-mod contract_database_depository;
-mod contract_mock_depository;
+pub mod contract;
+pub mod contract_database_depository;
+pub mod contract_mock_depository;
 mod contract_repository;
 mod invoice;
-mod invoice_generation;
+pub mod invoice_generation;
 mod invoice_generation_strategy;
-mod payment;
-mod presenter;
+pub mod payment;
+pub mod presenter;
 mod tests;
